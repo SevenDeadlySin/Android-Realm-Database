@@ -18,7 +18,8 @@
 		android:id="@+id/etAge"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:hint="Age"/>
+		android:hint="Age"
+		android:inputType="number"/>
 
 	<EditText
 		android:id="@+id/etSocialAccount"

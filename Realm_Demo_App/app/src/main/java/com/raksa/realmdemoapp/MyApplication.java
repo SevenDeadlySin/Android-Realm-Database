@@ -12,12 +12,14 @@ public class MyApplication extends Application {
 	public void onCreate() {
 		super.onCreate();
 
-		Realm.init(this);
+		//setting up realm in Application
 
-		RealmConfiguration configuration = new RealmConfiguration.Builder()
-				.name("myFirstRealm.realm") // By default the name of db is "default.realm"
+		Realm.init(this);
+		RealmConfiguration realmConfiguration = new RealmConfiguration.Builder()
+				.name("myFirstRealm.realm")
 				.build();
 
-		Realm.setDefaultConfiguration(configuration);
+		Realm.setDefaultConfiguration(realmConfiguration);
+
 	}
 }
