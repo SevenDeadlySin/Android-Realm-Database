@@ -1,5 +1,6 @@
 package com.raksa.realmdemoapp;
 
+import android.icu.lang.UCharacter;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -13,6 +14,7 @@ import java.util.UUID;
 
 import io.realm.Realm;
 import io.realm.RealmAsyncTask;
+import io.realm.RealmResults;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -82,9 +84,49 @@ public class MainActivity extends AppCompatActivity {
 	// Add Data to Realm in the Background Thread.
 	public void addUserToRealm_ASynchronously(View view) {
 
+		final String id = UUID.randomUUID().toString();
+
+		myRealm.executeTransactionAsync(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                User user = realm.createObject(User.class, id);
+                user.setName(etPersonName.getText().toString());
+                user.setAge(Integer.valueOf(etAge.getText().toString()));
+                SocialAccount socialAccount = realm.createObject(SocialAccount.class);
+                socialAccount.setName(etSocialAccountName.getText().toString());
+                socialAccount.setStatus(etStatus.getText().toString());
+                user.setSocialAccount(socialAccount);
+            }
+        }, new Realm.Transaction.OnSuccess() {
+            @Override
+            public void onSuccess() {
+                Toast.makeText(getApplicationContext(),"Successfully inserted into realm database",Toast.LENGTH_SHORT).show();
+            }
+        }, new Realm.Transaction.OnError() {
+            @Override
+            public void onError(Throwable error) {
+                Toast.makeText(getApplicationContext(),"Fail To Insert Into realm database!",Toast.LENGTH_SHORT).show();
+            }
+        });
+
 	}
 
 	public void displayAllUsers(View view) {
+
+        RealmResults<User> results = myRealm.where(User.class).findAll();
+
+        StringBuilder stringBuilder = new StringBuilder();
+
+        for (User getuser:results){
+            stringBuilder.append("ID: ").append(getuser.getId());
+            stringBuilder.append("Name: ").append(getuser.getName());
+            stringBuilder.append("Age: ").append(getuser.getAge());
+            stringBuilder.append("SocialAccount: ").append(getuser.getSocialAccount().getName());
+            stringBuilder.append("Status: ").append(getuser.getSocialAccount().getStatus());
+            stringBuilder.append("\n\n");
+        }
+
+        Toast.makeText(getApplicationContext(),stringBuilder,Toast.LENGTH_LONG).show();
 
 	}
 
@@ -92,11 +134,15 @@ public class MainActivity extends AppCompatActivity {
 	protected void onStop() {
 		super.onStop();
 
+        if (realmAsyncTask!=null&&!realmAsyncTask.isCancelled()){
+            realmAsyncTask.cancel();
+        }
+
 	}
 
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-
+        myRealm.close();
 	}
 }
