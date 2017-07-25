@@ -12,6 +12,7 @@ import com.raksa.realmdemoapp.model.User;
 
 import java.util.UUID;
 
+import io.realm.Case;
 import io.realm.Realm;
 import io.realm.RealmAsyncTask;
 import io.realm.RealmResults;
@@ -130,6 +131,22 @@ public class MainActivity extends AppCompatActivity {
 
 	}
 
+	public void sampleQueryExample(View view) {
+
+		myRealm.executeTransactionAsync(new Realm.Transaction() {
+			@Override
+			public void execute(Realm realm) {
+				User deleteUser = realm.where(User.class)
+						.contains("name","Raksa",Case.INSENSITIVE)
+						.findFirst();
+				deleteUser.deleteFromRealm();
+			}
+		});
+
+
+
+	}
+
 	@Override
 	protected void onStop() {
 		super.onStop();
@@ -145,4 +162,6 @@ public class MainActivity extends AppCompatActivity {
 		super.onDestroy();
         myRealm.close();
 	}
+
+
 }
